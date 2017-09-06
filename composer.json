@@ -1,0 +1,13 @@
+{
+    "name": "webas/analytics_widget-extension",
+    "type": "streams-addon",
+    "description": "A dashboard admin item manager.",
+    "require": {
+        "spatie/laravel-analytics": "^2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webas\\AnalyticsWidgetExtension\\": "src/"
+        }
+    }
+}

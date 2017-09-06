@@ -1,0 +1,96 @@
+{% if widget.data.errors %}
+    {{ widget.data.errors|raw }}
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+
+<canvas id="line-chart" width="800" height="450"></canvas>
+
+<script>
+    window.chartColors = {
+        red: 'rgb(255, 99, 132)',
+        orange: 'rgb(255, 159, 64)',
+        yellow: 'rgb(255, 205, 86)',
+        green: 'rgb(75, 192, 192)',
+        blue: 'rgb(54, 162, 235)',
+        purple: 'rgb(153, 102, 255)',
+        grey: 'rgb(201, 203, 207)'
+    };
+
+    new Chart(document.getElementById("line-chart"), {
+        type: 'line',
+        data: {
+            labels: {{ widget.data.dates|raw }},
+            datasets: [{
+                data: {{ widget.data.visitors|raw }},
+                label: "Visitors",
+                borderColor: window.chartColors.green,
+                fill: false
+            }, {
+                data: {{ widget.data.pageViews|raw }},
+                label: "Page views",
+                borderColor: window.chartColors.blue,
+                fill: false
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Pages views and visitors stats'
+            }
+        }
+    });
+
+    var lineChartData = {
+        labels: {{ widget.data.dates|raw }},
+        datasets: [{
+            label: "Visitors",
+            borderColor: window.chartColors.red,
+            backgroundColor: window.chartColors.red,
+            fill: false,
+            data: {{ widget.data.pageViews|raw }},
+            yAxisID: "y-axis-1",
+        }, {
+            label: "Page views",
+            borderColor: window.chartColors.blue,
+            backgroundColor: window.chartColors.blue,
+            fill: false,
+            data: {{ widget.data.visitors|raw }},
+            yAxisID: "y-axis-2"
+        }]
+    };
+
+    window.onload = function () {
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myLine = Chart.Line(ctx, {
+            data: lineChartData,
+            options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                title: {
+                    display: true,
+                    text: 'Visitors vs Page views'
+                },
+                scales: {
+                    yAxes: [{
+                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: "left",
+                        id: "y-axis-1",
+                    }, {
+                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: "right",
+                        id: "y-axis-2",
+
+                        // grid line settings
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    }],
+                }
+            }
+        });
+    };
+</script>
