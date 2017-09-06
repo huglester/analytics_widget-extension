@@ -34,7 +34,6 @@ class LoadItems
      * Handle the widget data.
      * @param FileRepositoryInterface $files
      * @param ConfigurationRepositoryInterface $configuration
-     * @param File $
      */
     public function handle(FileRepositoryInterface $files, ConfigurationRepositoryInterface $configuration)
     {
@@ -61,25 +60,14 @@ class LoadItems
 
     private function getAnalyticsData($files, $configuration)
     {
-        $days = $configuration->value(
-            'webas.extension.analytics_widget::days',
-            $this->widget->id,
-            30
-        );
-        $view_id = $configuration->value(
-            'webas.extension.analytics_widget::view_id',
-            $this->widget->id
-        );
-        $auth_file_id = $configuration->value(
-            'webas.extension.analytics_widget::auth_file',
-            $this->widget->id
-        );
+        $days = $configuration->value('webas.extension.analytics_widget::days', $this->widget->id, 30);
+        $view_id = $configuration->value('webas.extension.analytics_widget::view_id', $this->widget->id);
+        $auth_file_id = $configuration->value('webas.extension.analytics_widget::auth_file', $this->widget->id);
 
-        $cache_key = 'webas.extension.analytics_widget_'.$days.'_'.$view_id.'_'.$auth_file_id;
-
+        /*$cache_key = 'webas.extension.analytics_widget_'.$days.'_'.$view_id.'_'.$auth_file_id;
         if ($exits = cache($cache_key)) {
             return $exits;
-        }
+        }*/
 
         $file = null;
 
@@ -87,6 +75,7 @@ class LoadItems
             $file = $files->find($auth_file_id);
         }
 
+        /* $file FileModel */
         if (! $file or ! $view_id) {
             $this->widget->addData('errors', 'File or View ID not set.');
             return;
@@ -95,7 +84,7 @@ class LoadItems
         $analyticsConfig = [
             'view_id' => $view_id,
             'cache_lifetime_in_minutes' => 60 * 24,
-            'service_account_credentials_json' => $file->url(),
+            'service_account_credentials_json' => public_path('app/default/files-module/local/'.$file->path()),
             'cache_location' => storage_path('app/laravel-google-analytics/google-cache/'),
         ];
 
@@ -104,9 +93,9 @@ class LoadItems
         $return = $analyticsClient->fetchTotalVisitorsAndPageViews(Period::days($days));
 
         // Cache
-        cache([
+        /*cache([
             $cache_key => $return,
-        ], 60 * 3);
+        ], 60 * 3);*/
 
         return $return;
     }

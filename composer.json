@@ -1,7 +1,7 @@
 {
     "name": "webas/analytics_widget-extension",
     "type": "streams-addon",
-    "description": "A dashboard admin item manager.",
+    "description": "Google Analytics widget for PyroCMS 3",
     "require": {
         "spatie/laravel-analytics": "^2.0.0"
     },
