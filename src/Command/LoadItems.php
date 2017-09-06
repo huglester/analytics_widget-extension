@@ -53,8 +53,6 @@ class LoadItems
             return (string) $item['date']->format('Y-m-d');
         });
 
-        // $pages = \Analytics::fetchMostVisitedPages(Period::days(30));
-
         // Load the items to the widget's view data.
         $this->widget->addData('visitors', json_encode($analyticsData->pluck('visitors')->toArray()));
         $this->widget->addData('pageViews', json_encode($analyticsData->pluck('pageViews')->toArray()));
@@ -76,6 +74,13 @@ class LoadItems
             'webas.extension.analytics_widget::auth_file',
             $this->widget->id
         );
+
+        $cache_key = 'webas.extension.analytics_widget_'.$days.'_'.$view_id.'_'.$auth_file_id;
+
+        if ($exits = cache($cache_key)) {
+            return $exits;
+        }
+
         $file = null;
 
         if ($auth_file_id) {
@@ -96,6 +101,13 @@ class LoadItems
 
         $client = AnalyticsClientFactory::createForConfig($analyticsConfig);
         $analyticsClient = new Analytics($client, $analyticsConfig['view_id']);
-        return $analyticsClient->fetchTotalVisitorsAndPageViews(Period::days($days));
+        $return = $analyticsClient->fetchTotalVisitorsAndPageViews(Period::days($days));
+
+        // Cache
+        cache([
+            $cache_key => $return,
+        ], 60 * 3);
+
+        return $return;
     }
 }
